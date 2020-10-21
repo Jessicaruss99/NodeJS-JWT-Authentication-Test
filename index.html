@@ -13,7 +13,7 @@
 
     <div class="container-fluid">
 
-        <h1 class="row">Login</h1>
+        <h1 class="row">Login Here</h1>
 
         <main>
             <div class="row">
@@ -29,6 +29,7 @@
             <div>
                 <button onclick="login()">Login</button>
                 <button onclick="getDashboard()">Get Dashboard</button>
+                <button onclick="getSettings()">Settings</button>
             </div>
 
         </main>
@@ -44,13 +45,17 @@
             }
             axios.post('/api/login',data)
                 .then(res => {
+                    
                     console.log(res);
                     document.getElementById('username').value = '';
                     document.getElementById('password').value = '';
                     if( res && res.data && res.data.success){
                         const token = res.data.token;
                         localStorage.setItem('jwt', token);
-                        getDashboard();
+                        
+                        //getDashboard();
+                        
+
                     }
                 });
         }
@@ -65,9 +70,36 @@
                 if(res && res.data && res.data.success){
                     document.querySelector('h1.row').innerHTML = 'Dashboard';
                     document.querySelector('main').innerHTML = res.data.myContent; 
+                    history.replaceState(null,null,'/api/dashboard'); 
+                    setTimeout(function(){ 
+                        alert("Timeout"); 
+                        localStorage.clear();
+                        history.replaceState(null,null,'/');
+                    }, 180,000);
+            });
+        }
+
+        function getSettings(){
+            const token = localStorage.getItem('jwt');
+            axios.get('/api/settings',{
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }).then(res =>{
+                if(res && res.data && res.data.success){
+                    document.querySelector('h1.row').innerHTML = 'Settings';
+                    document.querySelector('main').innerHTML = res.data.myContent;
+                    history.replaceState(null,null,'/api/settings'); 
+                    setTimeout(function(){ 
+                        alert("Timeout"); 
+                        localStorage.clear();
+                        history.replaceState(null,null,'/');
+                    }, 180,000);
                 }
             });
         }
+
+        
     </script>
     
 </body>
